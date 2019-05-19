@@ -1,0 +1,29 @@
+{
+  "name": "college-backend",
+  "version": "1.0.0",
+  "description": "\"initial\" \r \"lol\"",
+  "main": "index.js",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "mongodb": "^3.1.13",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2",
+    "express": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "scrape": "node scripts/scrape.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oxue/college-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oxue/college-backend/issues"
+  },
+  "homepage": "https://github.com/oxue/college-backend#readme"
+}

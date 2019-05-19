@@ -3,7 +3,8 @@ const $ = require('cheerio');
 const url = 'https://en.wikipedia.org/wiki/Rankings_of_universities_in_the_United_States';
 const mongo  = require('mongodb').MongoClient;
 
-const mongo_url = "mongodb://127.0.0.1:27017/";
+const config = require("./../lib/loadconfig.js")();
+const mongoUrl = config.mongoUrl;
 
 rp(url)
   .then((html)=>{
@@ -18,7 +19,7 @@ rp(url)
     }).get();
 
     // Connect to MongoDB now
-    mongo.connect(mongo_url, (err, db)=>{
+    mongo.connect(mongoUrl, { useNewUrlParser: true }, (err, db)=>{
       if(err) {
         console.log("wasn't able to connect to the db");
         throw err;
@@ -27,8 +28,9 @@ rp(url)
       for(let i = 0; i < collegeData.length; i++) {
         colleges
         .collection("college")
-        .update(collegeData[i], collegeData[i], {upsert:true});
+        .updateOne(collegeData[i], { $set: collegeData[i] }, { upsert:true });
       }
+      db.close();
     })
   })
   .catch(function(err){
