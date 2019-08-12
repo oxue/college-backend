@@ -4,6 +4,8 @@
   "description": "\"initial\" \r \"lol\"",
   "main": "index.js",
   "dependencies": {
+    "@sendgrid/mail": "^6.4.0",
+    "babel-preset-es2015": "^6.24.1",
     "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.2",
     "express": "*",
@@ -12,14 +14,14 @@
     "request-promise": "^4.2.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
-    "@babel/register": "^7.4.4"
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "scrape": "node scripts/scrape.js",
-    "start": "node index.js"
+    "start": "node start.js"
   },
   "repository": {
     "type": "git",

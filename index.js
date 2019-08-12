@@ -2,10 +2,12 @@ const express = require("express");
 const app = express();
 const mongo = require('mongodb').MongoClient;
 const config = require("./lib/loadconfig.js")();
+const institution_email = require('./lib/institution_email.js');
 const bodyParser = require('body-parser');
+import { createUnactivatedUser, activateUser } from './lib/college_users.js';
 
-mongoUrl = config.mongoUrl;
-webPort = config.webPort;
+const mongoUrl = config.mongoUrl;
+const webPort = config.webPort;
 app.use(bodyParser.json());
 app.set('view engine', 'html');
 
@@ -13,21 +15,21 @@ app.get('/', function (req, res) {
   res.send("Hello");
 });
 
-queryMongo = (queryMethod) => {
-  mongo.connect(mongoUrl, { useNewUrlParser: true }, (err, db) => {
-    console.log("mongo connection");
-    if (err) {
-      console.log("wasn't able to connect to the db");
-      throw err;
-    }
-    queryMethod(db);
-  })
+const queryMongo = (queryMethod) => {
+  mongo.connect(mongoUrl, { useNewUrlParser: true })
+    .then(queryMethod)
+    .catch(err => {
+      if (err) {
+        console.log("wasn't able to connect to the db");
+        throw err;
+      }
+    });
 }
 
 app.get('/colleges', function (req, res) {
   queryMongo((db) => {
-    college = db.db("college");
-    response = college.collection("college").find({}).toArray(function (err, result) {
+    const college = db.db("college");
+    const response = college.collection("college").find({}).toArray(function (err, result) {
       res.json(result);
       db.close();
     });
@@ -36,13 +38,33 @@ app.get('/colleges', function (req, res) {
 
 app.get('/blackademias', function (req, res) {
   queryMongo(db => {
-    college = db.db("college");
-    response = college.collection("blackademia").find({}).toArray(function (err, result) {
+    const college = db.db("college");
+    const response = college.collection("blackademia").find({}).toArray(function (err, result) {
       res.json(result);
       db.close();
     });
   })
 });
+
+app.post('/activate' , (req, res) => {
+  activateUser(req.body.email, req.body.activation_code).then(() => {
+    res.status(200).json({})
+  });
+})
+
+app.post('/registeremail', function(req, res) {
+  //verify that the email is supported and derive the instution from it
+  const institution = institution_email(req.body.email);
+  if (!institution) {
+    res.send(403, "institution not supported");
+    return;
+  }
+
+  createUnactivatedUser(req.body.email, institution)
+    .then((code)=>{
+      res.status(200).json({msg:'acont created', verificationCode:code});
+    });
+})
 
 app.post('/admin/blackademia', (req, res) => {
   const name = req.body.name;

@@ -2,18 +2,18 @@ const mongo = require("mongodb").MongoClient;
 const config = require("./../lib/loadconfig.js")();
 const mongoUrl = config.mongoUrl;
 
-newBlackademias = [
+newChannels = [
   {
     "college_name": "University of Waterloo",
-    "blackademia_url": "/b/uwaterloo"
+    "channel_name": "uwaterloo"
   },
   {
     "college_name": "University of British Columia",
-    "blackademia_url": "/b/ubc"
+    "channel_name": "ubc"
   },
   {
     "college_name": "Stanford University",
-    "blackademia_url": "/b/ustanford"
+    "channel_name": "ustanford"
   }
 ]
 
@@ -23,11 +23,11 @@ mongo.connect(mongoUrl, { useNewUrlParser: true }, (err, db)=>{
     throw err;
   }
   colleges = db.db("college");
-  for(let i = 0; i < newBlackademias.length; i++){
-    let blackademia = newBlackademias[i];
+  for(let i = 0; i < newChannels.length; i++){
+    let channel = newChannels[i];
     colleges
-      .collection("blackademia")
-      .updateOne(blackademia, {$set: blackademia}, {upsert:true});
+      .collection("channel")
+      .updateOne(channel, {$set: channel}, {upsert:true});
   }
   db.close();
 })
