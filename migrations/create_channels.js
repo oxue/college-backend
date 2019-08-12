@@ -1,33 +1,29 @@
 const mongo = require("mongodb").MongoClient;
 const config = require("./../lib/loadconfig.js")();
 const mongoUrl = config.mongoUrl;
+const mongoose = require("mongoose");
+const Channel = require("../models/channel.js").Channel;
 
-newChannels = [
+const newChannels = [
   {
-    "college_name": "University of Waterloo",
-    "channel_name": "uwaterloo"
+    "institution_name": "University of Waterloo",
+    "channel_id": "uwaterloo"
   },
   {
-    "college_name": "University of British Columia",
-    "channel_name": "ubc"
+    "institution_name": "University of British Columia",
+    "channel_id": "ubc"
   },
   {
-    "college_name": "Stanford University",
-    "channel_name": "ustanford"
+    "institution_name": "Stanford University",
+    "channel_id": "ustanford"
   }
 ]
 
-mongo.connect(mongoUrl, { useNewUrlParser: true }, (err, db)=>{
-  if(err) {
-    console.log("wasn't able to connect to the db");
-    throw err;
-  }
-  colleges = db.db("college");
-  for(let i = 0; i < newChannels.length; i++){
-    let channel = newChannels[i];
-    colleges
-      .collection("channel")
-      .updateOne(channel, {$set: channel}, {upsert:true});
-  }
-  db.close();
-})
+mongoose.connect(mongoUrl + 'college')
+
+for (let channelData of newChannels){
+  const channel = new Channel(channelData);
+  channel.save();
+}
+
+process.exit();

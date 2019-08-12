@@ -4,10 +4,14 @@ const mongo = require('mongodb').MongoClient;
 const config = require("./lib/loadconfig.js")();
 const institution_email = require('./lib/institution_email.js');
 const bodyParser = require('body-parser');
+import mongoose from "mongoose";
 import { createUnactivatedUser, activateUser } from './lib/college_users.js';
 
 const mongoUrl = config.mongoUrl;
 const webPort = config.webPort;
+
+mongoose.connect("mongodb://127.0.0.1:27017/college", { useNewUrlParser: true });
+
 app.use(bodyParser.json());
 app.set('view engine', 'html');
 
@@ -16,14 +20,12 @@ app.get('/', function (req, res) {
 });
 
 const queryMongo = (queryMethod) => {
-  mongo.connect(mongoUrl, { useNewUrlParser: true })
-    .then(queryMethod)
-    .catch(err => {
-      if (err) {
-        console.log("wasn't able to connect to the db");
-        throw err;
-      }
-    });
+  mongo.connect(mongoUrl, { useNewUrlParser: true }).then(queryMethod).catch(err => {
+    if (err) {
+      console.log("wasn't able to connect to the db");
+      throw err;
+    }
+  });
 }
 
 app.get('/colleges', function (req, res) {
@@ -60,10 +62,9 @@ app.post('/registeremail', function(req, res) {
     return;
   }
 
-  createUnactivatedUser(req.body.email, institution)
-    .then((code)=>{
-      res.status(200).json({msg:'acont created', verificationCode:code});
-    });
+  createUnactivatedUser(req.body.email, institution).then((code)=>{
+    res.status(200).json({msg:'acont created', verificationCode:code});
+  });
 })
 
 app.post('/admin/blackademia', (req, res) => {
