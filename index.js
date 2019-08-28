@@ -5,7 +5,7 @@ const config = require("./lib/loadconfig.js")();
 const institution_email = require('./lib/institution_email.js');
 const bodyParser = require('body-parser');
 import mongoose from "mongoose";
-import { createUnactivatedUser, activateUser } from './lib/college_users.js';
+import { createUnactivatedUser, activateUser, login } from './lib/college_users.js';
 
 const mongoUrl = config.mongoUrl;
 const webPort = config.webPort;
@@ -53,6 +53,19 @@ app.post('/activate' , (req, res) => {
     res.status(200).json({})
   });
 })
+
+app.post('/login', (req, res) => {
+  console.log(`login with ${req.body.email} and ${req.body.password}`)
+  login(req.body.email, req.body.password).then((user) => {
+    console.log(user)
+    if(user.state == 'success'){
+      res.status(200).json(user)
+    }
+  }).catch((err)=> {
+    res.status(420).json({msg:"unauthorized"})
+  })
+
+});
 
 app.post('/registeremail', function(req, res) {
   //verify that the email is supported and derive the instution from it
