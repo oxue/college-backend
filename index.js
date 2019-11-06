@@ -6,6 +6,8 @@ const institution_email = require('./lib/institution_email.js');
 const bodyParser = require('body-parser');
 import mongoose from "mongoose";
 import { createUnactivatedUser, activateUser, login } from './lib/college_users.js';
+import { Post } from './models/post.js'
+import { User } from './models/user.js'
 
 const mongoUrl = config.mongoUrl;
 const webPort = config.webPort;
@@ -76,11 +78,12 @@ app.post('/registeremail', function(req, res) {
   }
 
   createUnactivatedUser(req.body.email, institution).then((code)=>{
-    res.status(200).json({msg:'acont created', verificationCode:code});
+    res.status(200).json({msg:'account created', verificationCode:code});
   });
 })
 
-app.post('/admin/blackademia', (req, res) => {
+// endpoint for creating channel
+app.post('/admin/channel', (req, res) => {
   const name = req.body.name;
   const shortName = req.body.short_name;
   const isPublic = req.body.is_public;
@@ -119,6 +122,33 @@ app.post('/admin/blackademia', (req, res) => {
     });
   });
 });
+
+const create = (req, res) => {
+  // const result = validationResult(req);
+  // if (!result.isEmpty()) {
+  //   const errors = result.array({ onlyFirstError: true });
+  //   return res.status(422).json({ errors });
+  // }
+
+  const { title, url, category, type, text } = req.body;
+  User.findOne({}).then(user=>{
+    const author = user.id
+    Post.create({
+      title,
+      url,
+      author,
+      category,
+      type,
+      text
+    });
+  }); //req.user.id;
+
+  //res.status(201).json(post);
+
+};
+
+app.post('/post', create)
+
 
 app.listen(webPort, function () {
   console.log("server started on port " + config.webPort);
