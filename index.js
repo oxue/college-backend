@@ -1,3 +1,6 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 const express = require("express");
 const app = express();
 const mongo = require('mongodb').MongoClient;
@@ -123,17 +126,27 @@ app.post('/admin/channel', (req, res) => {
   });
 });
 
-const create = (req, res) => {
+app.get('/posts', async (req, res) => {
+  const posts = await Post.find().sort('-score');
+  res.json(posts);
+  // try {
+  //
+  // } catch (e) {
+  //   throw e
+  // }
+})
+
+app.post('/posts', async (req, res) => {
   // const result = validationResult(req);
   // if (!result.isEmpty()) {
   //   const errors = result.array({ onlyFirstError: true });
   //   return res.status(422).json({ errors });
   // }
-
-  const { title, url, category, type, text } = req.body;
-  User.findOne({}).then(user=>{
+  try {
+    const { title, url, category, type, text } = req.body;
+    const user = await User.findOne({})
     const author = user.id
-    Post.create({
+    const post = await Post.create({
       title,
       url,
       author,
@@ -141,13 +154,15 @@ const create = (req, res) => {
       type,
       text
     });
-  }); //req.user.id;
+    res.status(201).json(post);
+  } catch (e) {
+    throw e
+  }
+   //req.user.id;
 
   //res.status(201).json(post);
 
-};
-
-app.post('/post', create)
+})
 
 
 app.listen(webPort, function () {
